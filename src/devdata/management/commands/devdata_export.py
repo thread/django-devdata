@@ -33,8 +33,25 @@ class Command(BaseCommand):
             help="Skip updates that already exist and are non-empty.",
             action="store_true",
         )
+        parser.add_argument(
+            "-j",
+            "--jobs",
+            dest="concurrency",
+            type=int,
+            required=False,
+            help="Number of concurrent threads used for data export. Export is sequential if left empty.",
+        )
 
-    def handle(self, *, dest, only=None, database, no_update, **options):
+    def handle(
+        self,
+        *,
+        dest,
+        only=None,
+        database,
+        no_update,
+        concurrency=None,
+        **options
+    ):
         try:
             validate_strategies(only)
         except AssertionError as e:
@@ -43,4 +60,6 @@ class Command(BaseCommand):
         dest_dir = (Path.cwd() / dest).absolute()
 
         export_migration_state(database, dest_dir)
-        export_data(database, dest_dir, only, no_update)
+        export_data(
+            database, dest_dir, only, no_update, concurrency=concurrency
+        )

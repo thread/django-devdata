@@ -73,6 +73,11 @@ def sort_model_strategies(model_strategies):
 
         model_dependencies.append((model, deps))
 
+    dependency_graph = {
+        to_app_model_label(x): set(to_app_model_label(z) for z in y)
+        for x, y in model_dependencies
+    }
+
     model_dependencies.reverse()
 
     model_list = []
@@ -106,11 +111,12 @@ def sort_model_strategies(model_strategies):
 
         model_dependencies = skipped
 
-    return [
+    sorted_strategies = [
         (to_app_model_label(y), x)
         for y in model_list
         for x in model_strategies[to_app_model_label(y)]
     ]
+    return sorted_strategies, dependency_graph
 
 
 @functools.lru_cache(maxsize=32)
